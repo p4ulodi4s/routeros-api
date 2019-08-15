@@ -1,3 +1,8 @@
+> This is the same code as the BenMenking / routeros-api repository.
+> I have not made any updates.
+> I added in packagist because i think the original project won't do that.
+
+
 # routeros-api
 Client API for RouterOS/Mikrotik
 
