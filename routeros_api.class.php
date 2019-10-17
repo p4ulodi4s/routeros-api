@@ -9,9 +9,9 @@
  *    Jeremy Jefferson (http://jeremyj.com)
  *    Cristian Deluxe (djcristiandeluxe [at] gmail [dot] com)
  *    Mikhail Moskalev (mmv.rus [at] gmail [dot] com)
+ *    Paulo Dias (prmdjweb [at] gmail [dot] com)
  *
  * http://www.mikrotik.com
- * http://wiki.mikrotik.com/wiki/API_PHP_class
  *
  ******************************/
 
@@ -94,10 +94,19 @@ class RouterosAPI
      */
     public function connect($ip, $login, $password)
     {
+        $ciphers = 'ADH:ALL';        
+
+        $sslVersion = OPENSSL_VERSION_TEXT;
+
+	    if (preg_match( "/^OpenSSL [1-9]\.[0-9]/", $sslVersion)) {
+
+		    $ciphers .= ':@SECLEVEL=0';
+	    }
+
         for ($ATTEMPT = 1; $ATTEMPT <= $this->attempts; $ATTEMPT++) {
             $this->connected = false;
             $PROTOCOL = ($this->ssl ? 'ssl://' : '' );
-            $context = stream_context_create(array('ssl' => array('ciphers' => 'ADH:ALL', 'verify_peer' => false, 'verify_peer_name' => false)));
+            $context = stream_context_create(array('ssl' => array('ciphers' => $ciphers, 'verify_peer' => false, 'verify_peer_name' => false)));
             $this->debug('Connection attempt #' . $ATTEMPT . ' to ' . $PROTOCOL . $ip . ':' . $this->port . '...');
             $this->socket = @stream_socket_client($PROTOCOL . $ip.':'. $this->port, $this->error_no, $this->error_str, $this->timeout, STREAM_CLIENT_CONNECT,$context);
             if ($this->socket) {
